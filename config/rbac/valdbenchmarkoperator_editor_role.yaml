@@ -1,0 +1,24 @@
+# permissions for end users to edit valdbenchmarkoperators.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: valdbenchmarkoperator-editor-role
+rules:
+- apiGroups:
+  - benchmark.vankichi.github.io
+  resources:
+  - valdbenchmarkoperators
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - benchmark.vankichi.github.io
+  resources:
+  - valdbenchmarkoperators/status
+  verbs:
+  - get

@@ -1,0 +1,6 @@
+apiVersion: benchmark.vankichi.github.io/v1
+kind: ValdBenchmarkOperator
+metadata:
+  name: valdbenchmarkoperator-sample
+spec:
+  # TODO(user): Add fields here

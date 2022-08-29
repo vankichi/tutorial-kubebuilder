@@ -1,0 +1,16 @@
+domain: vankichi.github.io
+layout:
+- go.kubebuilder.io/v3
+projectName: tutorial-kubebuilder
+repo: github.com/vankichi/tutorial-kubebuilder
+resources:
+- api:
+    crdVersion: v1
+    namespaced: true
+  controller: true
+  domain: vankichi.github.io
+  group: benchmark
+  kind: ValdBenchmarkOperator
+  path: github.com/vankichi/tutorial-kubebuilder/api/v1
+  version: v1
+version: "3"
