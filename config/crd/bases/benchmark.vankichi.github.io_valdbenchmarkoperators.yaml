@@ -15,11 +15,19 @@ spec:
     singular: valdbenchmarkoperator
   scope: Namespaced
   versions:
-  - name: v1
+  - additionalPrinterColumns:
+    - jsonPath: .status
+      name: STATUS
+      type: string
+    name: v1
     schema:
       openAPIV3Schema:
         description: ValdBenchmarkOperator is the Schema for the valdbenchmarkoperators
           API
+        enum:
+        - NotReady
+        - Available
+        - Healthy
         properties:
           apiVersion:
             description: 'APIVersion defines the versioned schema of this representation
@@ -90,6 +98,7 @@ spec:
                     dimension:
                       type: integer
                     epsilon:
+                      default: 0.2
                       type: number
                     iter:
                       type: integer
@@ -102,10 +111,13 @@ spec:
                       format: int32
                       type: integer
                     radius:
+                      default: -1
                       type: number
                     repetition:
+                      default: 1
                       type: integer
                     replica:
+                      default: 1
                       type: integer
                     rules:
                       items:
@@ -133,15 +145,10 @@ spec:
                       type: string
                   required:
                   - dimension
-                  - epsilon
                   - iter
                   - job_type
                   - min_num
                   - num
-                  - radius
-                  - repetition
-                  - replica
-                  - rules
                   - timeout
                   type: object
                 type: array
@@ -163,7 +170,7 @@ spec:
           status:
             description: ValdBenchmarkOperatorStatus defines the observed state of
               ValdBenchmarkOperator
-            type: object
+            type: string
         type: object
     served: true
     storage: true

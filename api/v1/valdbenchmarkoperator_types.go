@@ -34,18 +34,27 @@ type ValdBenchmarkJobSpec struct {
 	// +optional
 	Target *BenchmarkTarget `json:"target" yaml:"target"`
 	// +optional
-	Dataset    *BenchmarkDataset   `json:"dataset" yaml:"dataset"`
-	Replica    int                 `json:"replica" yaml:"replica"`
-	Repetition int                 `json:"repetition" yaml:"repetition"`
-	JobType    string              `json:"job_type" yaml:"job_type"`
-	Dimension  int                 `json:"dimension" yaml:"dimension"`
-	Epsilon    float32             `json:"epsilon" yaml:"epsilon"`
-	Radius     float32             `json:"radius" yaml:"radius"`
-	Iter       int                 `json:"iter" yaml:"iter"`
-	Num        int32               `json:"num" yaml:"num"`
-	MinNUm     int32               `json:"min_num" yaml:"min_num"`
-	Timeout    string              `json:"timeout" yaml:"timeout"`
-	Rules      []*BenchmarkJobRule `json:"rules" yaml:"rules"`
+	Dataset *BenchmarkDataset `json:"dataset" yaml:"dataset"`
+	// +kubebuilder:default=1
+	// +optional
+	Replica int `json:"replica" yaml:"replica"`
+	// +kubebuilder:default=1
+	// +optional
+	Repetition int    `json:"repetition" yaml:"repetition"`
+	JobType    string `json:"job_type" yaml:"job_type"`
+	Dimension  int    `json:"dimension" yaml:"dimension"`
+	// +kubebuilder:default=0.2
+	// +optional
+	Epsilon float32 `json:"epsilon" yaml:"epsilon"`
+	// +kubebuilder:default=-1
+	// +optional
+	Radius  float32 `json:"radius" yaml:"radius"`
+	Iter    int     `json:"iter" yaml:"iter"`
+	Num     int32   `json:"num" yaml:"num"`
+	MinNUm  int32   `json:"min_num" yaml:"min_num"`
+	Timeout string  `json:"timeout" yaml:"timeout"`
+	// +optional
+	Rules []*BenchmarkJobRule `json:"rules" yaml:"rules"`
 }
 
 type BenchmarkTarget struct {
@@ -71,13 +80,18 @@ type BenchmarkJobRule struct {
 }
 
 // ValdBenchmarkOperatorStatus defines the observed state of ValdBenchmarkOperator
-type ValdBenchmarkOperatorStatus struct {
-	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
-	// Important: Run "make" to regenerate code after modifying this file
-}
+type ValdBenchmarkOperatorStatus string
+
+const (
+	ValdBenchmarkOperatorNotReady  = ValdBenchmarkOperatorStatus("NotReady")
+	ValdBenchmarkOperatorAvailable = ValdBenchmarkOperatorStatus("Available")
+	ValdBenchmarkOperatorHealthy   = ValdBenchmarkOperatorStatus("Healthy")
+)
 
 //+kubebuilder:object:root=true
 //+kubebuilder:subresource:status
+//+kubebuilder:validation:Enum=NotReady;Available;Healthy
+//+kubebuilder:printcolumn:name="STATUS",type="string",JSONPath=".status"
 
 // ValdBenchmarkOperator is the Schema for the valdbenchmarkoperators API
 type ValdBenchmarkOperator struct {
