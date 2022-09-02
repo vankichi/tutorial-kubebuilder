@@ -24,13 +24,13 @@ import (
 // NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
 
 // ValdBenchmarkOperatorSpec defines the desired state of ValdBenchmarkOperator
-type ValdBenchmarkOperatorSpec struct {
+type BenchmarkOperatorSpec struct {
 	Target  *BenchmarkTarget        `json:"target" yaml:"target"`
 	Dataset *BenchmarkDataset       `json:"dataset" yaml:"dataset"`
-	Jobs    []*ValdBenchmarkJobSpec `json:"jobs" yaml:"jobs"`
+	Jobs    []*BenchmarkJobSpec `json:"jobs" yaml:"jobs"`
 }
 
-type ValdBenchmarkJobSpec struct {
+type BenchmarkJobSpec struct {
 	// +optional
 	Target *BenchmarkTarget `json:"target" yaml:"target"`
 	// +optional
@@ -80,12 +80,12 @@ type BenchmarkJobRule struct {
 }
 
 // ValdBenchmarkOperatorStatus defines the observed state of ValdBenchmarkOperator
-type ValdBenchmarkOperatorStatus string
+type BenchmarkOperatorStatus string
 
 const (
-	ValdBenchmarkOperatorNotReady  = ValdBenchmarkOperatorStatus("NotReady")
-	ValdBenchmarkOperatorAvailable = ValdBenchmarkOperatorStatus("Available")
-	ValdBenchmarkOperatorHealthy   = ValdBenchmarkOperatorStatus("Healthy")
+	BenchmarkOperatorNotReady  = BenchmarkOperatorStatus("NotReady")
+	BenchmarkOperatorAvailable = BenchmarkOperatorStatus("Available")
+	BenchmarkOperatorHealthy   = BenchmarkOperatorStatus("Healthy")
 )
 
 //+kubebuilder:object:root=true
@@ -98,8 +98,8 @@ type ValdBenchmarkOperator struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   ValdBenchmarkOperatorSpec   `json:"spec,omitempty"`
-	Status ValdBenchmarkOperatorStatus `json:"status,omitempty"`
+	Spec   BenchmarkOperatorSpec   `json:"spec,omitempty"`
+	Status BenchmarkOperatorStatus `json:"status,omitempty"`
 }
 
 //+kubebuilder:object:root=true
