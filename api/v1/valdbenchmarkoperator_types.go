@@ -25,8 +25,8 @@ import (
 
 // ValdBenchmarkOperatorSpec defines the desired state of ValdBenchmarkOperator
 type BenchmarkOperatorSpec struct {
-	Target  *BenchmarkTarget        `json:"target" yaml:"target"`
-	Dataset *BenchmarkDataset       `json:"dataset" yaml:"dataset"`
+	Target  *BenchmarkTarget    `json:"target" yaml:"target"`
+	Dataset *BenchmarkDataset   `json:"dataset" yaml:"dataset"`
 	Jobs    []*BenchmarkJobSpec `json:"jobs" yaml:"jobs"`
 }
 
