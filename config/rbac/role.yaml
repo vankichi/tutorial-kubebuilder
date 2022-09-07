@@ -20,7 +20,7 @@ rules:
 - apiGroups:
   - benchmark.vankichi.github.io
   resources:
-  - valdbenchmarkoperators
+  - benchmarkoperators
   verbs:
   - create
   - delete
@@ -32,13 +32,13 @@ rules:
 - apiGroups:
   - benchmark.vankichi.github.io
   resources:
-  - valdbenchmarkoperators/finalizers
+  - benchmarkoperators/finalizers
   verbs:
   - update
 - apiGroups:
   - benchmark.vankichi.github.io
   resources:
-  - valdbenchmarkoperators/status
+  - benchmarkoperators/status
   verbs:
   - get
   - patch

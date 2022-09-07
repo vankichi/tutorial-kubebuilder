@@ -10,7 +10,11 @@ resources:
   controller: true
   domain: vankichi.github.io
   group: benchmark
-  kind: ValdBenchmarkOperator
+  kind: BenchmarkOperator
   path: github.com/vankichi/tutorial-kubebuilder/api/v1
   version: v1
+  webhooks:
+    defaulting: true
+    validation: true
+    webhookVersion: v1
 version: "3"

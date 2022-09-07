@@ -89,11 +89,15 @@ func main() {
 		os.Exit(1)
 	}
 
-	if err = (&controllers.ValdBenchmarkOperatorReconciler{
+	if err = (&controllers.BenchmarkOperatorReconciler{
 		Client: mgr.GetClient(),
 		Scheme: mgr.GetScheme(),
 	}).SetupWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create controller", "controller", "ValdBenchmarkOperator")
+		setupLog.Error(err, "unable to create controller", "controller", "BenchmarkOperator")
+		os.Exit(1)
+	}
+	if err = (&benchmarkv1.BenchmarkOperator{}).SetupWebhookWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create webhook", "webhook", "BenchmarkOperator")
 		os.Exit(1)
 	}
 	//+kubebuilder:scaffold:builder

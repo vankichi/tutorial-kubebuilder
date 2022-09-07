@@ -5,14 +5,14 @@ metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.9.2
   creationTimestamp: null
-  name: valdbenchmarkoperators.benchmark.vankichi.github.io
+  name: benchmarkoperators.benchmark.vankichi.github.io
 spec:
   group: benchmark.vankichi.github.io
   names:
-    kind: ValdBenchmarkOperator
-    listKind: ValdBenchmarkOperatorList
-    plural: valdbenchmarkoperators
-    singular: valdbenchmarkoperator
+    kind: BenchmarkOperator
+    listKind: BenchmarkOperatorList
+    plural: benchmarkoperators
+    singular: benchmarkoperator
   scope: Namespaced
   versions:
   - additionalPrinterColumns:
@@ -22,12 +22,7 @@ spec:
     name: v1
     schema:
       openAPIV3Schema:
-        description: ValdBenchmarkOperator is the Schema for the valdbenchmarkoperators
-          API
-        enum:
-        - NotReady
-        - Available
-        - Healthy
+        description: BenchmarkOperator is the Schema for the markdownviews API
         properties:
           apiVersion:
             description: 'APIVersion defines the versioned schema of this representation
@@ -42,9 +37,10 @@ spec:
           metadata:
             type: object
           spec:
-            description: ValdBenchmarkOperatorSpec defines the desired state of ValdBenchmarkOperator
+            description: BenchmarkOperatorSpec defines the desired state of BenchmarkOperator
             properties:
               dataset:
+                description: BenchmarkDataset defines the desired state of BenchmarkDateset
                 properties:
                   group:
                     type: string
@@ -53,6 +49,8 @@ spec:
                   name:
                     type: string
                   range:
+                    description: BenchmarkDatasetRange defines the desired state of
+                      BenchmarkDatesetRange
                     properties:
                       end:
                         type: integer
@@ -70,8 +68,10 @@ spec:
                 type: object
               jobs:
                 items:
+                  description: BenchmarkJobSpec defines the desired state of BenchmarkJob
                   properties:
                     dataset:
+                      description: BenchmarkDataset defines the desired state of BenchmarkDateset
                       properties:
                         group:
                           type: string
@@ -80,6 +80,8 @@ spec:
                         name:
                           type: string
                         range:
+                          description: BenchmarkDatasetRange defines the desired state
+                            of BenchmarkDatesetRange
                           properties:
                             end:
                               type: integer
@@ -98,7 +100,6 @@ spec:
                     dimension:
                       type: integer
                     epsilon:
-                      default: 0.2
                       type: number
                     iter:
                       type: integer
@@ -111,16 +112,15 @@ spec:
                       format: int32
                       type: integer
                     radius:
-                      default: -1
                       type: number
                     repetition:
-                      default: 1
                       type: integer
                     replica:
-                      default: 1
                       type: integer
                     rules:
                       items:
+                        description: BenchmarkJobRule defines the desired state of
+                          BenchmarkJobRule
                         properties:
                           name:
                             type: string
@@ -132,6 +132,7 @@ spec:
                         type: object
                       type: array
                     target:
+                      description: BenchmarkTarget defines the desired state of BenchmarkTarget
                       properties:
                         host:
                           type: string
@@ -153,6 +154,8 @@ spec:
                   type: object
                 type: array
               target:
+                description: 'INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
+                  Important: Run "make" to regenerate code after modifying this file'
                 properties:
                   host:
                     type: string
@@ -164,12 +167,14 @@ spec:
                 type: object
             required:
             - dataset
-            - jobs
             - target
             type: object
           status:
-            description: ValdBenchmarkOperatorStatus defines the observed state of
-              ValdBenchmarkOperator
+            description: BenchmarkOperatorStatus defines the observed state of BenchmarkOperator
+            enum:
+            - NotReady
+            - Available
+            - Healthy
             type: string
         type: object
     served: true

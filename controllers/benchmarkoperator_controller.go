@@ -27,15 +27,15 @@ import (
 	benchmarkv1 "github.com/vankichi/tutorial-kubebuilder/api/v1"
 )
 
-// ValdBenchmarkOperatorReconciler reconciles a ValdBenchmarkOperator object
-type ValdBenchmarkOperatorReconciler struct {
+// BenchmarkOperatorReconciler reconciles a BenchmarkOperator object
+type BenchmarkOperatorReconciler struct {
 	client.Client
 	Scheme *runtime.Scheme
 }
 
-//+kubebuilder:rbac:groups=benchmark.vankichi.github.io,resources=valdbenchmarkoperators,verbs=get;list;watch;create;update;patch;delete
-//+kubebuilder:rbac:groups=benchmark.vankichi.github.io,resources=valdbenchmarkoperators/status,verbs=get;update;patch
-//+kubebuilder:rbac:groups=benchmark.vankichi.github.io,resources=valdbenchmarkoperators/finalizers,verbs=update
+//+kubebuilder:rbac:groups=benchmark.vankichi.github.io,resources=benchmarkoperators,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=benchmark.vankichi.github.io,resources=benchmarkoperators/status,verbs=get;update;patch
+//+kubebuilder:rbac:groups=benchmark.vankichi.github.io,resources=benchmarkoperators/finalizers,verbs=update
 //+kubebuilder:rbac:groups=core,resources=configmaps,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=apps,resources=deployments,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=core,resources=services,verbs=get;list;watch;create;update;patch;delete
@@ -44,13 +44,13 @@ type ValdBenchmarkOperatorReconciler struct {
 // Reconcile is part of the main kubernetes reconciliation loop which aims to
 // move the current state of the cluster closer to the desired state.
 // TODO(user): Modify the Reconcile function to compare the state specified by
-// the ValdBenchmarkOperator object against the actual cluster state, and then
+// the BenchmarkOperator object against the actual cluster state, and then
 // perform operations to make the cluster state reflect the state specified by
 // the user.
 //
 // For more details, check Reconcile and its Result here:
 // - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.12.1/pkg/reconcile
-func (r *ValdBenchmarkOperatorReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
+func (r *BenchmarkOperatorReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	_ = log.FromContext(ctx)
 
 	// TODO(user): your logic here
@@ -59,8 +59,8 @@ func (r *ValdBenchmarkOperatorReconciler) Reconcile(ctx context.Context, req ctr
 }
 
 // SetupWithManager sets up the controller with the Manager.
-func (r *ValdBenchmarkOperatorReconciler) SetupWithManager(mgr ctrl.Manager) error {
+func (r *BenchmarkOperatorReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
-		For(&benchmarkv1.ValdBenchmarkOperator{}).
+		For(&benchmarkv1.BenchmarkOperator{}).
 		Complete(r)
 }
