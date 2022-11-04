@@ -1,0 +1,128 @@
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.9.2
+  creationTimestamp: null
+  name: benchmarkjobs.benchmark.vankichi.github.io
+spec:
+  group: benchmark.vankichi.github.io
+  names:
+    kind: BenchmarkJob
+    listKind: BenchmarkJobList
+    plural: benchmarkjobs
+    singular: benchmarkjob
+  scope: Namespaced
+  versions:
+  - name: v1
+    schema:
+      openAPIV3Schema:
+        description: BenchmarkJob is the Schema for the markdownviews API
+        properties:
+          apiVersion:
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            type: string
+          kind:
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: BenchmarkJobSpec defines the desired state of BenchmarkJob
+            properties:
+              dataset:
+                description: BenchmarkDataset defines the desired state of BenchmarkDateset
+                properties:
+                  group:
+                    type: string
+                  indexes:
+                    type: integer
+                  name:
+                    type: string
+                  range:
+                    description: BenchmarkDatasetRange defines the desired state of
+                      BenchmarkDatesetRange
+                    properties:
+                      end:
+                        type: integer
+                      start:
+                        type: integer
+                    required:
+                    - end
+                    - start
+                    type: object
+                required:
+                - group
+                - indexes
+                - name
+                - range
+                type: object
+              dimension:
+                type: integer
+              epsilon:
+                type: number
+              iter:
+                type: integer
+              job_type:
+                type: string
+              min_num:
+                format: int32
+                type: integer
+              num:
+                format: int32
+                type: integer
+              radius:
+                type: number
+              repetition:
+                type: integer
+              replica:
+                type: integer
+              rules:
+                items:
+                  description: BenchmarkJobRule defines the desired state of BenchmarkJobRule
+                  properties:
+                    name:
+                      type: string
+                    type:
+                      type: string
+                  required:
+                  - name
+                  - type
+                  type: object
+                type: array
+              target:
+                description: BenchmarkTarget defines the desired state of BenchmarkTarget
+                properties:
+                  host:
+                    type: string
+                  port:
+                    type: integer
+                required:
+                - host
+                - port
+                type: object
+              timeout:
+                type: string
+            required:
+            - dimension
+            - iter
+            - job_type
+            - min_num
+            - num
+            - timeout
+            type: object
+          status:
+            description: BenchmarkOperatorStatus defines the observed state of BenchmarkOperator
+            enum:
+            - NotReady
+            - Available
+            - Healthy
+            type: string
+        type: object
+    served: true
+    storage: true

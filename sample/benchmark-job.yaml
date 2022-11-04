@@ -1,0 +1,20 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: vald-benchmark-job
+spec:
+  template:
+    spec:
+      containers:
+        - name: vald-benchmark-job
+          image: local-registry:5000/vdaas/vald-benchmark-job
+          imagePullPolicy: Always
+          volumeMounts:
+            - name: vald-benchmark-job-configmap-sample
+              mountPath: /etc/server/
+      restartPolicy: Never
+      volumes:
+        - name: vald-benchmark-job-configmap-sample
+          configMap:
+            defaultMode: 420
+            name: vald-benchmark-job-configmap-sample
