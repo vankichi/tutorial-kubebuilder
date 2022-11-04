@@ -18,9 +18,9 @@ package controllers
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 
+	"gopkg.in/yaml.v2"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/intstr"
@@ -30,6 +30,7 @@ import (
 
 	benchmarkv1 "github.com/vankichi/tutorial-kubebuilder/api/v1"
 	appsv1 "k8s.io/api/apps/v1"
+	batchv1 "k8s.io/api/batch/v1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
@@ -48,6 +49,7 @@ type BenchmarkOperatorReconciler struct {
 //+kubebuilder:rbac:groups=apps,resources=deployments,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=core,resources=services,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=core,resources=events,verbs=create;update;patch
+//+kubebuilder:rbac:groups=batch,resources=jobs,verbs=get;list;watch;create;update;patch;delete
 
 // Reconcile is part of the main kubernetes reconciliation loop which aims to
 // move the current state of the cluster closer to the desired state.
@@ -91,15 +93,23 @@ func (r *BenchmarkOperatorReconciler) Reconcile(ctx context.Context, req ctrl.Re
 		logger.Info("BenchmarkOperatorList:\n", "spec", b.Spec)
 	}
 
-	if !bO.ObjectMeta.DeletionTimestamp.IsZero() {
+	if !bO.DeletionTimestamp.IsZero() {
 		return ctrl.Result{}, nil
 	}
 
 	// Apply Configmap
-	err = r.reconcileConfigMap(ctx, bO)
+	logger.Info("Reconcile Configmap:\n")
+	// now := strconv.FormatInt(time.Now().UnixNano(), 10)
+	// jobName := "vald-benchmark-job-" + bO.Name + now
+	_, err = r.reconcileConfigMap(ctx, bO)
 	if err != nil {
 		return ctrl.Result{}, err
 	}
+
+	// err = r.Reconcile_BenchmarkJob(ctx, bO, *bO.Spec.Jobs[0])
+	// if err != nil {
+	// 	return ctrl.Result{}, err
+	// }
 	return ctrl.Result{}, nil
 }
 
@@ -109,6 +119,103 @@ func (r *BenchmarkOperatorReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&benchmarkv1.BenchmarkOperator{}).
 		Complete(r)
+}
+
+func (r *BenchmarkOperatorReconciler) reconcileConfigMap(ctx context.Context, bO benchmarkv1.BenchmarkOperator) (ctrl.Result, error) {
+	logger := log.FromContext(ctx)
+
+	cm := &corev1.ConfigMap{}
+	cm.SetNamespace(bO.Namespace)
+	name := "vald-benchmark-job-configmap-" + bO.Name
+	cm.SetName(name)
+
+	op, err := ctrl.CreateOrUpdate(ctx, r.Client, cm, func() error {
+		if cm.Data == nil {
+			cm.Data = make(map[string]string)
+		}
+		for _, content := range bO.Spec.Jobs {
+			s := map[string]interface{}{
+				"version":   "v0.0.0",
+				"time_zone": "JST",
+				"Logging": struct {
+					logger string
+					level  string
+					format string
+				}{
+					logger: "glg",
+					level:  "debug",
+					format: "raw",
+				},
+				"job": content,
+			}
+			b, _ := yaml.Marshal(&s)
+			cm.Data["config.yaml"] = string(b)
+
+		}
+		return ctrl.SetControllerReference(&bO, cm, r.Scheme)
+	})
+
+	if err != nil {
+		logger.Error(err, "unable to create or update ConfigMap")
+		return ctrl.Result{}, err
+	}
+	logger.WithValues("configmap_name", name)
+	if op != controllerutil.OperationResultNone {
+		logger.Info("reconcile ConfigMap successfully", "op", op)
+	}
+	return ctrl.Result{}, nil
+}
+
+func (r *BenchmarkOperatorReconciler) Reconcile_BenchmarkJob(ctx context.Context, bO benchmarkv1.BenchmarkOperator, spec benchmarkv1.BenchmarkJobSpec) error {
+	logger := log.FromContext(ctx)
+
+	job := &batchv1.Job{}
+	job.Namespace = bO.GetNamespace()
+	// now := strconv.FormatInt(time.Now().UnixNano(), 10)
+	configmapName := "vald-benchmark-job-configmap-" + bO.Name
+	name := "vald-benchmark-job-" + spec.JobType
+	job.SetName(name)
+	var mode int32 = 420
+	job.Spec.Template.Spec.Volumes = []corev1.Volume{
+		{
+			Name: configmapName,
+			VolumeSource: corev1.VolumeSource{
+				ConfigMap: &corev1.ConfigMapVolumeSource{
+					DefaultMode: &mode,
+					LocalObjectReference: corev1.LocalObjectReference{
+						Name: configmapName,
+					},
+				},
+			},
+		},
+	}
+	job.Spec.Template.Spec.Containers = []corev1.Container{
+		{
+			Name:            name,
+			Image:           "local-registry:5000/vdaas/vald-benchmark-job",
+			ImagePullPolicy: corev1.PullAlways,
+			VolumeMounts: []corev1.VolumeMount{
+				{
+					Name:      configmapName,
+					MountPath: "/etc/server",
+				},
+			},
+		},
+	}
+	job.Spec.Template.Spec.RestartPolicy = corev1.RestartPolicyNever
+
+	op, err := ctrl.CreateOrUpdate(ctx, r.Client, job, func() error {
+		return ctrl.SetControllerReference(&bO, job, r.Scheme)
+	})
+
+	if err != nil {
+		logger.Error(err, "unable to create or update Job")
+		return err
+	}
+	if op != controllerutil.OperationResultNone {
+		logger.Info("reconcile Job successfully", "op", op)
+	}
+	return nil
 }
 
 func (r *BenchmarkOperatorReconciler) Reconcile_createOrUpdate(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
@@ -159,33 +266,4 @@ func (r *BenchmarkOperatorReconciler) Reconcile_deleteWithPreConditions(ctx cont
 func (r *BenchmarkOperatorReconciler) Reconcile_deleteAllOfDeployment(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	err := r.DeleteAllOf(ctx, &appsv1.Deployment{}, client.InNamespace("default"))
 	return ctrl.Result{}, err
-}
-
-func (r *BenchmarkOperatorReconciler) reconcileConfigMap(ctx context.Context, bO benchmarkv1.BenchmarkOperator) error {
-	logger := log.FromContext(ctx)
-
-	cm := &corev1.ConfigMap{}
-	cm.SetNamespace(bO.Namespace)
-	cm.SetName("benchmark-" + bO.Name)
-
-	op, err := ctrl.CreateOrUpdate(ctx, r.Client, cm, func() error {
-		if cm.Data == nil {
-			cm.Data = make(map[string]string)
-		}
-		for _, content := range bO.Spec.Jobs {
-			b, _ := json.Marshal(content)
-			cm.Data[content.JobType] = string(b)
-
-		}
-		return nil
-	})
-
-	if err != nil {
-		logger.Error(err, "unable to create or update ConfigMap")
-		return err
-	}
-	if op != controllerutil.OperationResultNone {
-		logger.Info("reconcile ConfigMap successfully", "op", op)
-	}
-	return nil
 }

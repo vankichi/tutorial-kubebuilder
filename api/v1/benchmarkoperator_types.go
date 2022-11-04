@@ -88,9 +88,9 @@ type BenchmarkJobRule struct {
 type BenchmarkOperatorStatus string
 
 const (
-	BenchmarkOperatorNotReady  = BenchmarkOperatorStatus("NotReady")
-	BenchmarkOperatorAvailable = BenchmarkOperatorStatus("Available")
-	BenchmarkOperatorHealthy   = BenchmarkOperatorStatus("Healthy")
+	BenchmarkOperatorNotReady  BenchmarkOperatorStatus = "NotReady"
+	BenchmarkOperatorAvailable BenchmarkOperatorStatus = "Available"
+	BenchmarkOperatorHealthy   BenchmarkOperatorStatus = "Healthy"
 )
 
 //+kubebuilder:object:root=true
@@ -99,7 +99,8 @@ const (
 
 // BenchmarkOperator is the Schema for the markdownviews API
 type BenchmarkOperator struct {
-	metav1.TypeMeta   `json:",inline"`
+	metav1.TypeMeta `json:",inline"`
+
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
 	Spec   BenchmarkOperatorSpec   `json:"spec,omitempty"`
@@ -115,6 +116,27 @@ type BenchmarkOperatorList struct {
 	Items           []BenchmarkOperator `json:"items"`
 }
 
+// BenchmarkJob is the Schema for the markdownviews API
+type BenchmarkJob struct {
+	metav1.TypeMeta   `json:",inline"`
+	metav1.ObjectMeta `json:"metadata,omitempty"`
+
+	Spec   BenchmarkJobSpec        `json:"spec,omitempty"`
+	Status BenchmarkOperatorStatus `json:"status,omitempty"`
+}
+
+//+kubebuilder:object:root=true
+
+// BenchmarkJobList contains a list of BenchmarkOperator
+type BenchmarkJobList struct {
+	metav1.TypeMeta `json:",inline"`
+	metav1.ListMeta `json:"metadata,omitempty"`
+	Items           []BenchmarkJob `json:"items"`
+}
+
 func init() {
-	SchemeBuilder.Register(&BenchmarkOperator{}, &BenchmarkOperatorList{})
+	SchemeBuilder.Register(
+		&BenchmarkOperator{},
+		&BenchmarkOperatorList{},
+	)
 }
